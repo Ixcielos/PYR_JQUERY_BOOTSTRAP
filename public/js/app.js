@@ -358,3 +358,78 @@ const aplicacionProductos = {
         // Mostrar alerta
         this.mostrarAlerta('info', 'Filtros limpios', 'Todos los filtros han sido restablecidos');
     },
+
+// ========================================================================
+    // MÉTODOS DE RENDERIZACIÓN
+    // ========================================================================
+
+    /**
+     * Renderiza la tabla de productos completa
+     * Si el arreglo está vacío, muestra un mensaje
+     */
+    renderizarTabla: function() {
+        if (this.arregloProductos.length === 0) {
+            $('#mensajeSinProductos').removeClass('d-none');
+            $('#tablaProductos').addClass('d-none');
+        } else {
+            $('#mensajeSinProductos').addClass('d-none');
+            $('#tablaProductos').removeClass('d-none');
+        }
+    },
+
+    /**
+     * Renderiza los productos en la tabla según el arreglo proporcionado
+     * @param {Array<Object>} arregloProductosAMostrar - Array de productos a mostrar
+     */
+    renderizarTablaProductos: function(arregloProductosAMostrar) {
+        // Obtener referencia al cuerpo de la tabla
+        let cuerpoTabla = $('#cuerpoTabla');
+        
+        // Limpiar contenido previo
+        cuerpoTabla.html('');
+
+        // Verificar si hay productos
+        if (arregloProductosAMostrar.length === 0) {
+            $('#mensajeSinProductos').removeClass('d-none');
+            $('#tablaProductos').addClass('d-none');
+            return;
+        }
+
+        $('#mensajeSinProductos').addClass('d-none');
+        $('#tablaProductos').removeClass('d-none');
+
+        // Iterar sobre los productos para construir las filas
+        for (let i = 0; i < arregloProductosAMostrar.length; i++) {
+            let producto = arregloProductosAMostrar[i];
+
+            // Construir fila HTML
+            let fila = `
+                <tr data-id-producto="${producto.id}">
+                    <td><strong>#${producto.id}</strong></td>
+                    <td>${producto.nombre}</td>
+                    <td>
+                        <span class="badge bg-info">$${producto.precio.toFixed(2)}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">${producto.categoria}</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-danger btnEliminarProducto" 
+                                data-id="${producto.id}"
+                                title="Eliminar producto">
+                            <i class="bi bi-trash-fill"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            // Agregar fila a la tabla
+            cuerpoTabla.append(fila);
+        }
+
+        // Configurar event listeners para botones de eliminar
+        $('.btnEliminarProducto').on('click', (evento) => {
+            let idProductoAEliminar = parseInt($(evento.currentTarget).data('id'));
+            this.eliminarProducto(idProductoAEliminar);
+        });
+    },
