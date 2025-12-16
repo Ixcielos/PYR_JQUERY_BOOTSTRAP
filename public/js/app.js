@@ -186,3 +186,12 @@ const aplicacionProductos = {
             $('#alertaValidacion').html('');
         }, 5000);
     },
+
+
+ /**
+     * Limpia todos los campos del formulario
+     */
+    limpiarFormulario: function() {
+        $('#formularioProducto')[0].reset();
+        $('#nombreProducto').focus();
+    },
