@@ -187,6 +187,54 @@ const aplicacionProductos = {
         }, 5000);
     },
 
+    // ========================================================================
+    // MÉTODOS DE GESTIÓN DE PRODUCTOS
+    // ========================================================================
+
+    /**
+     * Agrega un nuevo producto al arreglo después de validar
+     */
+    agregarProducto: function() {
+        // Validar formulario
+        let resultadoValidacion = this.validarFormularioProducto();
+
+        if (!resultadoValidacion.valido) {
+            // Construir mensaje de error
+            let mensajeErrores = resultadoValidacion.errores.join('<br>');
+            this.mostrarAlerta('error', 'Errores de validación:', mensajeErrores);
+            return;
+        }
+
+        // Obtener datos del formulario
+        let nombreProducto = $('#nombreProducto').val().trim();
+        let precioProducto = parseFloat($('#precioProducto').val());
+        let categoriaProducto = $('#categoriaProducto').val();
+
+        // Crear objeto producto
+        let nuevoProducto = {
+            id: ++this.contadorIdProducto,
+            nombre: nombreProducto,
+            precio: precioProducto,
+            categoria: categoriaProducto,
+            fechaRegistro: new Date().toLocaleDateString('es-ES')
+        };
+
+        // Agregar al arreglo
+        this.arregloProductos.push(nuevoProducto);
+
+        // Mostrar mensaje de éxito
+        this.mostrarAlerta(
+            'exito',
+            'Producto agregado:',
+            `"${nombreProducto}" ha sido registrado correctamente`
+        );
+
+        // Limpiar formulario
+        this.limpiarFormulario();
+
+        // Actualizar visualización
+        this.aplicarFiltrosYOrdenamiento();
+    },
 
  /**
      * Limpia todos los campos del formulario
@@ -194,4 +242,35 @@ const aplicacionProductos = {
     limpiarFormulario: function() {
         $('#formularioProducto')[0].reset();
         $('#nombreProducto').focus();
+    },
+
+    /**
+     * Elimina un producto del arreglo por su ID
+     * @param {Number} idProductoAEliminar - ID del producto a eliminar
+     */
+    eliminarProducto: function(idProductoAEliminar) {
+        // Buscar el índice del producto
+        let indiceProducto = -1;
+        
+        for (let i = 0; i < this.arregloProductos.length; i++) {
+            if (this.arregloProductos[i].id === idProductoAEliminar) {
+                indiceProducto = i;
+                break;
+            }
+        }
+
+        // Si se encontró, eliminarlo
+        if (indiceProducto !== -1) {
+            let nombreEliminado = this.arregloProductos[indiceProducto].nombre;
+            this.arregloProductos.splice(indiceProducto, 1);
+            
+            this.mostrarAlerta(
+                'exito',
+                'Producto eliminado:',
+                `"${nombreEliminado}" ha sido removido del sistema`
+            );
+
+            // Actualizar visualización
+            this.aplicarFiltrosYOrdenamiento();
+        }
     },
