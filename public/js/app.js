@@ -433,3 +433,92 @@ const aplicacionProductos = {
             this.eliminarProducto(idProductoAEliminar);
         });
     },
+
+     // ========================================================================
+    // MÉTODOS DE ESTADÍSTICAS
+    // ========================================================================
+
+    /**
+     * Calcula y muestra las estadísticas del sistema
+     */
+    mostrarEstadisticas: function() {
+        // Verificar si hay productos
+        if (this.arregloProductos.length === 0) {
+            this.mostrarAlerta('advertencia', 'Sin datos', 'No hay productos para mostrar estadísticas');
+            return;
+        }
+
+        // Calcular estadísticas
+        let estadisticas = this.calcularEstadisticas();
+
+        // Actualizar interfaz con los datos
+        $('#estadisticaTotalProductos').text(estadisticas.totalProductos);
+        $('#estadisticaPrecioPromedio').text('$' + estadisticas.precioPromedio.toFixed(2));
+        $('#estadisticaProductoMasBarato').text(estadisticas.productoMasBarato.nombre);
+        $('#estadisticaPrecioMasBarato').text('$' + estadisticas.productoMasBarato.precio.toFixed(2));
+        $('#estadisticaProductoMasWaro').text(estadisticas.productoMasWaro.nombre);
+        $('#estadisticaPrecioMasWaro').text('$' + estadisticas.productoMasWaro.precio.toFixed(2));
+
+        // Mostrar sección de estadísticas
+        $('#seccionEstadisticas').removeClass('d-none');
+
+        // Scroll hacia las estadísticas
+        $('html, body').animate({
+            scrollTop: $('#seccionEstadisticas').offset().top - 100
+        }, 'slow');
+    },
+
+    /**
+     * Calcula todas las estadísticas del sistema
+     * @returns {Object} Objeto con las estadísticas calculadas
+     */
+    calcularEstadisticas: function() {
+        let totalProductos = 0;
+        let sumaPrecios = 0;
+        let productoMasBarato = null;
+        let productoMasWaro = null;
+
+        // Iterar sobre todos los productos
+        for (let i = 0; i < this.arregloProductos.length; i++) {
+            let producto = this.arregloProductos[i];
+
+            // Contar productos
+            totalProductos++;
+
+            // Sumar precios
+            sumaPrecios += producto.precio;
+
+            // Encontrar producto más barato
+            if (productoMasBarato === null || producto.precio < productoMasBarato.precio) {
+                productoMasBarato = producto;
+            }
+
+            // Encontrar producto más caro
+            if (productoMasWaro === null || producto.precio > productoMasWaro.precio) {
+                productoMasWaro = producto;
+            }
+        }
+
+        // Calcular promedio
+        let precioPromedio = totalProductos > 0 ? sumaPrecios / totalProductos : 0;
+
+        // Retornar estadísticas
+        return {
+            totalProductos: totalProductos,
+            precioPromedio: precioPromedio,
+            productoMasBarato: productoMasBarato,
+            productoMasWaro: productoMasWaro
+        };
+    }
+};
+
+// ============================================================================
+// INICIALIZACIÓN CUANDO EL DOCUMENTO ESTÉ LISTO
+// ============================================================================
+
+/**
+ * Ejecuta la inicialización de la aplicación cuando jQuery esté lista
+ */
+$(document).ready(function() {
+    aplicacionProductos.inicializarAplicacion();
+});
