@@ -274,3 +274,87 @@ const aplicacionProductos = {
             this.aplicarFiltrosYOrdenamiento();
         }
     },
+
+    // ========================================================================
+    // MÉTODOS DE FILTRADO Y BÚSQUEDA
+    // ========================================================================
+
+    /**
+     * Aplica los filtros y ordenamiento actual a los productos
+     * Combina filtro de categoría, búsqueda en vivo y ordenamiento
+     */
+    aplicarFiltrosYOrdenamiento: function() {
+        // Copiar arreglo original para no modificarlo
+        let productosFiltrados = [];
+
+        // Aplicar filtro de categoría
+        for (let i = 0; i < this.arregloProductos.length; i++) {
+            let producto = this.arregloProductos[i];
+            
+            // Verificar si cumple el filtro de categoría
+            if (this.filtrosActuales.categoria !== 'todos' && 
+                producto.categoria !== this.filtrosActuales.categoria) {
+                continue;
+            }
+
+            // Verificar si cumple el filtro de búsqueda
+            if (this.filtrosActuales.busqueda !== '' && 
+                !producto.nombre.toLowerCase().includes(this.filtrosActuales.busqueda)) {
+                continue;
+            }
+
+            // Si llega aquí, cumple todos los filtros
+            productosFiltrados.push(producto);
+        }
+
+        // Aplicar ordenamiento por precio
+        if (this.filtrosActuales.ordenamiento === 'ascendente') {
+            // Ordenar de menor a mayor precio
+            for (let i = 0; i < productosFiltrados.length - 1; i++) {
+                for (let j = 0; j < productosFiltrados.length - 1 - i; j++) {
+                    if (productosFiltrados[j].precio > productosFiltrados[j + 1].precio) {
+                        // Intercambiar elementos
+                        let temporal = productosFiltrados[j];
+                        productosFiltrados[j] = productosFiltrados[j + 1];
+                        productosFiltrados[j + 1] = temporal;
+                    }
+                }
+            }
+        } else if (this.filtrosActuales.ordenamiento === 'descendente') {
+            // Ordenar de mayor a menor precio
+            for (let i = 0; i < productosFiltrados.length - 1; i++) {
+                for (let j = 0; j < productosFiltrados.length - 1 - i; j++) {
+                    if (productosFiltrados[j].precio < productosFiltrados[j + 1].precio) {
+                        // Intercambiar elementos
+                        let temporal = productosFiltrados[j];
+                        productosFiltrados[j] = productosFiltrados[j + 1];
+                        productosFiltrados[j + 1] = temporal;
+                    }
+                }
+            }
+        }
+
+        // Renderizar tabla con los productos filtrados
+        this.renderizarTablaProductos(productosFiltrados);
+    },
+
+    /**
+     * Limpia todos los filtros y restaura la visualización original
+     */
+    limpiarFiltros: function() {
+        // Resetear filtros
+        this.filtrosActuales.categoria = 'todos';
+        this.filtrosActuales.busqueda = '';
+        this.filtrosActuales.ordenamiento = 'ninguno';
+
+        // Resetear valores en la interfaz
+        $('#filtroCategoria').val('todos');
+        $('#buscadorProducto').val('');
+        $('#ordenamientoPrecio').val('ninguno');
+
+        // Actualizar visualización
+        this.aplicarFiltrosYOrdenamiento();
+
+        // Mostrar alerta
+        this.mostrarAlerta('info', 'Filtros limpios', 'Todos los filtros han sido restablecidos');
+    },
